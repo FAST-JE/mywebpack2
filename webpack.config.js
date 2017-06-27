@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
-const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 const PATHS = {
   src: path.join(__dirname, 'src'),
@@ -9,30 +10,47 @@ const PATHS = {
 
 module.exports = {
   entry: {
-    auth: PATHS.src + 'pages/auth/auth.js',
-    works: PATHS.src + 'pages/works/works.js',
-    about: PATHS.src + 'pages/about/about.js',
-    blog: PATHS.src + 'pages/blog/blog.js',
+    auth: path.resolve(PATHS.src, './pages/auth/auth.pug'),
+    works: path.resolve(PATHS.src, './pages/works/works.pug'),
+    about: path.resolve(PATHS.src, './pages/about/about.pug'),
+    blog: path.resolve(PATHS.src, './pages/blog/blog.pug')
   },
   output: {
-    path: PATHS.dist,
-    filename: 'bundle.js'
+    path: PATHS.dist, //!!!
+    filename: './js/[name].js'
   },
   module: {
     rules: [
-      // images from img/flags goes to flags-sprite.svg
       {
-        test: /\.svg$/,
-        loader: 'svg-sprite-loader',
-        include: path.resolve('./src/img/'),
+        test: /\.pug$/,
+        loader: 'pug-loader',
         options: {
-          extract: true,
-          spriteFilename: 'flags-sprite.svg'
+          pretty: true
         }
       }
     ]
   },
   plugins: [
-    new SpriteLoaderPlugin()
+    new CleanWebpackPlugin(PATHS.dist),
+    new HtmlWebpackPlugin({
+      filename: 'auth.html',
+      chunks: ['auth'],
+      template: path.resolve(PATHS.src, './pages/auth/auth.pug')
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'works.html',
+      chunks: ['works'],
+      template: path.resolve(PATHS.src, './pages/works/works.pug')
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'about.html',
+      chunks: ['about'],
+      template: path.resolve(PATHS.src, './pages/about/about.pug')
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'blog.html',
+      chunks: ['blog'],
+      template: path.resolve(PATHS.src, './pages/blog/blog.pug')
+    })
   ]
 };
